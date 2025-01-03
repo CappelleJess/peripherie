@@ -13,7 +13,7 @@ class MenuScene extends Phaser.Scene {
     
         //Chargement du bouton
         this.load.image('button', '../src/assets/images/buttons/button.png');
-        this.load.image('buttonpress', '../src/assets/images/buttons/buttonpress.png');
+        this.load.image('buttonpress',);
     }
     
     create() {
@@ -26,7 +26,7 @@ class MenuScene extends Phaser.Scene {
     
         //Titre du menu
         this.add.text(this.scale.width / 2, 50, 'Menu', {
-            font: '32px Arial',
+            font: '32px Verdana',
             fill: '#ffffff',
         }).setOrigin(0.5);
     
@@ -54,7 +54,7 @@ class MenuScene extends Phaser.Scene {
         this.layer1.tilePositionX += 0; // Ciel
         this.layer2.tilePositionX += 0.2;
         this.layer3.tilePositionX += 0.5;
-        this.layer4.tilePositionX += 1;
+        this.layer4.tilePositionX += 1.5;
         this.layer5.tilePositionX += 2;
     }
 }
@@ -64,10 +64,10 @@ var config = {
     type: Phaser.AUTO,
     width: 800,
     height: 600,
+    parent: 'game-container',
     physics: {
         default: 'arcade',
         arcade: {
-            //gravity: { y: 300 },
             debug: true
         }
     },
