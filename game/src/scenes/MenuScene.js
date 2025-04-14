@@ -6,8 +6,17 @@ export default class MenuScene extends Phaser.Scene {
   }
 
   create() {
-    // Fond uni ou image nostalgique (optionnel)
-    this.cameras.main.setBackgroundColor('#1e1e2e');
+    // Fond d'écran
+    this.add.image(400, 300, 'menu-bg').setOrigin(0.5);
+
+    // Musique d'ambiance (ne pas relancer si déjà jouée)
+    if (!this.sound.get('menu-music')) {
+      const music = this.sound.add('menu-music', {
+        volume: 0.2,
+        loop: true
+      });
+      music.play();
+    }
 
     // Titre du jeu
     this.add.text(400, 200, 'Périphérie', {
@@ -37,5 +46,7 @@ export default class MenuScene extends Phaser.Scene {
     startButton.on('pointerdown', () => {
       this.scene.start('RoomScene');
     });
+
+    this.cameras.main.fadeIn(1000, 0, 0, 0);
   }
 }

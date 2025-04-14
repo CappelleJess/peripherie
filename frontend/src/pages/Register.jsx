@@ -1,5 +1,9 @@
 import React, { useState } from "react";
 import { useAuth } from "../contexts/AuthContext";
+import { useContext, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { AuthContext } from "../contexts/AuthContext";
 
 function Register() {
   const [formData, setFormData] = useState({
@@ -33,20 +37,33 @@ function Register() {
     return Object.keys(formErrors).length === 0;
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+const { login } = useContext(AuthContext);
+const navigate = useNavigate();
 
-    if (validateForm()) {
-      try {
-        await register(formData.email, formData.password);  // Utiliser register du contexte
-        console.log("Utilisateur inscrit avec succès");
-      } catch (err) {
-        console.log("Erreur lors de l'inscription", err);
-      }
+const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  if (!validateForm()) return;
+
+  try {
+    const response = await axios.post("http://localhost:5000/api/register", {
+      name: formData.name,
+      email: formData.email,
+      password: formData.password,
+    });
+
+    // Enregistre le token et connecte l’utilisateur
+    login(response.data);
+    navigate("/dashboard");
+  } catch (err) {
+    if (err.response && err.response.status === 409) {
+      setErrors({ email: "Cet email est déjà utilisé." });
     } else {
-      console.log("Des erreurs sont présentes dans le formulaire");
+      console.error(err);
+      alert("Une erreur est survenue lors de l'inscription.");
     }
-  };
+  }
+};
 
   return (
     <div>
