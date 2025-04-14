@@ -5,7 +5,7 @@ import Footer from "./Footer";
 
 /**
  * Layout général : Header en haut, contenu central via <Outlet />, Footer en bas.
- * <Outlet /> représente ici les pages imbriquées (Homepage, Login, etc.)
+ * <Outlet /> = pages imbriquées (Homepage, Login, etc.)
  */
 function Layout({ isAuthenticated, setIsAuthenticated, setUser, children }) {
   return (

@@ -1,6 +1,6 @@
-const bcrypt = require('bcryptjs'); // Importer bcrypt pour le hachage du mot de passe
-const jwt = require('jsonwebtoken'); // Importer jsonwebtoken pour la création du JWT
-const User = require('../models/user'); // Importer le modèle utilisateur
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const User = require('../models/user');
 
 // Middleware pour vérifier le token JWT
 const verifyToken = (req, res, next) => {

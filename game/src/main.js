@@ -27,7 +27,7 @@ function create() {
     const music = this.sound.add('menu-music');
     music.play();
   });
-  this.add.image(400, 300, 'menu-bg');  // Ajout de l'image "sky" au centre de l'écran
+  this.add.image(400, 300, 'menu-bg'); 
 }
 
 // Fonction d'update
