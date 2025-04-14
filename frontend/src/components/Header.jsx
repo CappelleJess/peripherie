@@ -1,15 +1,26 @@
 import React from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 
-function Header({  isAuthenticated, setIsAuthenticated  }) {
+function Header({ isAuthenticated, setIsAuthenticated, setUser }) {
+  const navigate = useNavigate(); // ✅ Hook pour naviguer dynamiquement
 
   const handleLogout = () => {
-    setIsAuthenticated(false); //Réinitialisation de l'état de connexion
+    // Supprimer les données de l'utilisateur simulé
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+
+    // Réinitialiser les états globaux
+    setIsAuthenticated(false);
+    setUser(null);
+
+    // Rediriger vers la page d'accueil
+    navigate("/");
   };
 
   return (
     <header style={{ padding: "1rem", background: "#eee" }}>
       <nav style={{ display: "flex", gap: "1rem" }}>
+        {/* Lien toujours visible */}
         <NavLink
           to="/"
           style={({ isActive }) => ({
@@ -20,7 +31,7 @@ function Header({  isAuthenticated, setIsAuthenticated  }) {
           Accueil
         </NavLink>
 
-        {/* Afficher "Login" et "Register" si non connecté */}
+        {/* Lien conditionnel : dépend de l'état de connexion */}
         {!isAuthenticated ? (
           <>
             <NavLink

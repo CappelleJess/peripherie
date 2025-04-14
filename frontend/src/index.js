@@ -2,6 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 import App from "./App";
+import { AuthProvider } from "./contexts/AuthContext"; 
 
 /**
  * Point d’entrée de l’application.
@@ -10,8 +11,10 @@ import App from "./App";
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>
-    <BrowserRouter> {/* ← Ceci englobe toutes les routes */}
-      <App />
+    <BrowserRouter>
+      <AuthProvider>  {/* ← englober toute l'app avec le provider */}
+        <App />
+      </AuthProvider>
     </BrowserRouter>
   </React.StrictMode>
 );

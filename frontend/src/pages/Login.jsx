@@ -1,35 +1,59 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
 
-function Login({ setIsAuthenticated }) {
-  const [username, setUsername] = useState("");
+function Login() {
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
-  const handleLogin = (e) => {
+  const navigate = useNavigate();
+  const { login } = useAuth();  // Utiliser le hook du contexte Auth
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Utilisateur test
-    if(username === "user" && password === "password") {
-      setIsAuthenticated(true); // Connexion réussie
-      navigate("/dashboard"); // Redirection vers le Dashboard
-    } else {
-      alert("Identifiants incorrects !");
+    setLoading(true);
+    setError(null);
+
+    try {
+      await login(email, password);  // Utiliser la fonction login du contexte
+      navigate("/dashboard");  // Rediriger après une connexion réussie
+    } catch (err) {
+      setError("Identifiants incorrects.");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <div>
-      <h2>Connexion</h2>
-      <form onSubmit={handleLogin}>
+      <h1>Connexion</h1>
+      <form onSubmit={handleSubmit}>
         <div>
-          <label>Nom d'utilisateur: </label>
-          <input type="text" value={username} onChange={(e) => setUsername(e.target.value)}/>
+          <label>Email : </label>
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
         </div>
+
         <div>
-          <label>Mot de passe: </label>
-          <input type="text" value={password} onChange={(e) => setPassword(e.target.value)}/>
+          <label>Mot de passe : </label>
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
         </div>
-        <button type="submit">Se connecter</button>
+
+        <button type="submit" disabled={loading}>
+          {loading ? "Connexion..." : "Se connecter"}
+        </button>
+        {error && <p style={{ color: "red" }}>{error}</p>}
       </form>
     </div>
   );

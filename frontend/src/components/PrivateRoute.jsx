@@ -1,20 +1,16 @@
 import React from "react";
 import { Navigate } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
 
 /**
- * Composant qui protège les routes privées en vérifiant l'authentification.
- * Si l'utilisateur n'est pas authentifié, il est redirigé vers la page de login.
- * @param {boolean} isAuthenticated - État de l'authentification
- * @param {JSX.Element} children - Composants enfants à afficher si l'utilisateur est authentifié
+ * Composant pour protéger une route. 
+ * Si l'utilisateur est connecté, affiche le composant donné.
+ * Sinon, redirige vers /login.
  */
-function PrivateRoute({ isAuthenticated, children }) {
-  // Si l'utilisateur n'est pas authentifié, on le redirige vers la page de login
-  if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
-  }
+function PrivateRoute({ element }) {
+  const { isAuthenticated } = useAuth();
 
-  // Sinon, on rend les enfants (la page protégée)
-  return children;
+  return isAuthenticated ? element : <Navigate to="/login" replace />;
 }
 
 export default PrivateRoute;

@@ -2,6 +2,23 @@ const bcrypt = require('bcryptjs'); // Importer bcrypt pour le hachage du mot de
 const jwt = require('jsonwebtoken'); // Importer jsonwebtoken pour la création du JWT
 const User = require('../models/user'); // Importer le modèle utilisateur
 
+// Middleware pour vérifier le token JWT
+const verifyToken = (req, res, next) => {
+  const token = req.header('Authorization')?.replace('Bearer ', '');
+
+  if (!token) {
+    return res.status(401).json({ message: 'Token manquant ou invalide' });
+  }
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = decoded; // Ajouter les informations de l'utilisateur au request
+    next(); // Passer à la route suivante
+  } catch (err) {
+    return res.status(401).json({ message: 'Token invalide ou expiré' });
+  }
+};
+
 // Fonction d'inscription des utilisateurs
 const register = async (req, res) => {
   const { email, password } = req.body; // Récupérer les données du corps de la requête
@@ -67,4 +84,4 @@ const login = async (req, res) => {
 };
 
 // Exporter les fonctions pour pouvoir les utiliser dans les routes
-module.exports = { register, login };
+module.exports = { register, login, verifyToken };

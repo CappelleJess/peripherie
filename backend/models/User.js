@@ -1,21 +1,35 @@
 const mongoose = require('mongoose');
+const bcrypt = require('bcryptjs');
 
-// Définir le schéma de l'utilisateur
+// Schéma pour l'utilisateur
 const userSchema = new mongoose.Schema({
-  email: {
+  username: {
     type: String,
     required: true,
-    unique: true, // L'email doit être unique dans la base de données
+    unique: true,
   },
   password: {
     type: String,
     required: true,
   },
-  // TODO: Ajouter d'autres champs comme un nom, une photo de profil, etc.
 });
 
-// Créer le modèle avec le schéma utilisateur
-const User = mongoose.model('User', userSchema);
+// Méthode pour hasher le mot de passe avant de sauvegarder
+userSchema.pre('save', async function (next) {
+  if (!this.isModified('password')) return next();
 
-// Exporter le modèle pour l'utiliser dans les contrôleurs
-module.exports = User;
+  try {
+    const salt = await bcrypt.genSalt(10);
+    this.password = await bcrypt.hash(this.password, salt);
+    next();
+  } catch (error) {
+    next(error);
+  }
+});
+
+// Méthode pour vérifier le mot de passe
+userSchema.methods.comparePassword = function (password) {
+  return bcrypt.compare(password, this.password);
+};
+
+module.exports = mongoose.model('User', userSchema);
