@@ -1,10 +1,11 @@
-const express = require('express'); 
-const dotenv = require('dotenv'); 
-const connectDB = require('./config/db'); 
-const authRoutes = require('./routes/authRoutes.js');
+import express, { json } from 'express'; 
+import { config } from 'dotenv'; 
+import connectDB from './config/db.js';
+import authRoutes from './routes/authRoutes.js';
+import profileRoutes from './routes/profileRoutes.js';
 
 // Chargement des variables d'environnement depuis le fichier .env
-dotenv.config();
+config();
 
 // Connexion à la base de données MongoDB
 connectDB();
@@ -13,7 +14,7 @@ connectDB();
 const app = express();
 
 // Middleware pour parser les requêtes JSON
-app.use(express.json());
+app.use(json());
 
 // Utiliser les routes d'authentification
 app.use('/api/auth', (req, res, next) => {
@@ -21,8 +22,14 @@ app.use('/api/auth', (req, res, next) => {
   next();
 }, authRoutes);
 
+// Utiliser les routes de profils
+app.use('/api/profile', (req, res, next) => {
+  console.log('Routing request to /api/profile');
+  next();
+}, profileRoutes);
+
 // Route simple pour tester
-app.get('/', (_req, res) => {
+app.get('/', (req, res) => {
   res.send('Bienvenue sur le backend de Périphérie !');
 });
 

@@ -1,6 +1,5 @@
-const express = require('express');
-const { register, login } = require('../controllers/authController');
-const { verifyToken } = require('../controllers/authController');
+import express from 'express';
+import { register, login, verifyToken } from '../controllers/authController.js';
 
 const router = express.Router(); // Créer un routeur Express
 
@@ -18,4 +17,4 @@ router.get('/profile', verifyToken, (req, res) => {
     });
   });
 
-module.exports = router;
+export default router;

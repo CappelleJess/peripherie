@@ -1,9 +1,7 @@
 import React, { useState } from "react";
-import { useAuth } from "../contexts/AuthContext";
-import { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { AuthContext } from "../contexts/AuthContext";
+import { useAuth } from "../contexts/AuthContext";
 
 function Register() {
   const [formData, setFormData] = useState({
@@ -12,9 +10,13 @@ function Register() {
     password: "",
     confirmPassword: "",
   });
-  const [errors, setErrors] = useState({});
-  const { register } = useAuth();  // Utiliser la fonction register du contexte
 
+  const [errors, setErrors] = useState({});
+  const navigate = useNavigate();
+
+  const { login } = useAuth();
+
+  // Met à jour les champs du formulaire
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -22,48 +24,51 @@ function Register() {
     });
   };
 
+  // Validation des champs du formulaire
   const validateForm = () => {
-    let formErrors = {};
+    const formErrors = {};
 
     if (!formData.name) formErrors.name = "Le nom est requis";
     if (!formData.email) formErrors.email = "L'email est requis";
-    else if (!/\S+@\S+\.\S+/.test(formData.email)) formErrors.email = "Email invalide";
+    else if (!/\S+@\S+\.\S+/.test(formData.email))
+      formErrors.email = "Email invalide";
     if (!formData.password) formErrors.password = "Le mot de passe est requis";
-    else if (formData.password.length < 6) formErrors.password = "Le mot de passe doit contenir au moins 6 caractères";
-    if (formData.password !== formData.confirmPassword) formErrors.confirmPassword = "Les mots de passe ne correspondent pas";
+    else if (formData.password.length < 6)
+      formErrors.password =
+        "Le mot de passe doit contenir au moins 6 caractères";
+    if (formData.password !== formData.confirmPassword)
+      formErrors.confirmPassword = "Les mots de passe ne correspondent pas";
 
     setErrors(formErrors);
-
     return Object.keys(formErrors).length === 0;
   };
 
-const { login } = useContext(AuthContext);
-const navigate = useNavigate();
+  // Soumission du formulaire d'inscription
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-const handleSubmit = async (e) => {
-  e.preventDefault();
+    if (!validateForm()) return;
 
-  if (!validateForm()) return;
+    try {
+      // Appel au backend (Express) pour enregistrer un nouvel utilisateur
+      const response = await axios.post("http://localhost:5000/api/register", {
+        name: formData.name,
+        email: formData.email,
+        password: formData.password,
+      });
 
-  try {
-    const response = await axios.post("http://localhost:5000/api/register", {
-      name: formData.name,
-      email: formData.email,
-      password: formData.password,
-    });
-
-    // Enregistre le token et connecte l’utilisateur
-    login(response.data);
-    navigate("/dashboard");
-  } catch (err) {
-    if (err.response && err.response.status === 409) {
-      setErrors({ email: "Cet email est déjà utilisé." });
-    } else {
-      console.error(err);
-      alert("Une erreur est survenue lors de l'inscription.");
+      // Stockage du token et email via le contexte d'authentification
+      login(response.data);
+      navigate("/dashboard");
+    } catch (err) {
+      if (err.response && err.response.status === 409) {
+        setErrors({ email: "Cet email est déjà utilisé." });
+      } else {
+        console.error(err);
+        alert("Une erreur est survenue lors de l'inscription.");
+      }
     }
-  }
-};
+  };
 
   return (
     <div>
