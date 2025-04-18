@@ -63,6 +63,7 @@ const register = async (req, res) => {
 };
 
 // Fonction de connexion des utilisateurs
+console.log("Requête de connexion reçue: ", req.method, req.body);
 const login = async (req, res) => {
   const { email, password } = req.body; // Récupérer les informations d'identification
 
@@ -85,7 +86,7 @@ const login = async (req, res) => {
     });
 
     // Renvoyer la réponse avec le token d'authentification
-    res.status(200).json({ message: 'Connexion réussie', token });
+    res.status(200).json({ message: 'Connexion réussie', token, username: user.username });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Erreur serveur' });

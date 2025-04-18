@@ -1,44 +1,56 @@
-import React, { createContext, useState, useContext } from "react";
-import axios from "axios";
+import React, { createContext, useState, useContext, useEffect } from "react";
+import { /*login as loginService, register as registerService,*/ logout as logoutService } from "../services/authService";
 
 // Créer un contexte pour l'authentification
 const AuthContext = createContext();
 
 // Créer un hook personnalisé pour accéder au contexte
-export const useAuth = () => {
-  return useContext(AuthContext);
-};
+export const useAuth = () => useContext(AuthContext);
 
 // Créer le AuthProvider pour gérer l'état d'authentification
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(null); // utilisateur actuel
+  const [loading, setLoading] = useState(true); //chargement initial
 
-  // Fonction pour se connecter
+    // Chargement initial depuis localStorage
+    useEffect(() => {
+      const storedUser = localStorage.getItem("user");
+      if (storedUser) {
+        setUser(JSON.parse(storedUser));
+      }
+      setLoading(false);
+    }, []);
+
+  // Fonction pour se connecter/connexion via API
   const login = async (email, password) => {
+    console.log("AuthContext + login()", email, password);
     try {
-      // Simule une requête d'authentification (à remplacer par une vraie API)
-      const response = await axios.post("/api/login", { email, password });
-      setUser(response.data);  // Stocke l'utilisateur dans l'état
-      localStorage.setItem("user", JSON.stringify(response.data));  // Stocke l'utilisateur dans le localStorage
+      //const token = await loginService({ email, password });
+      // Décodage du token si besoin pour stocker infos utilisateur
+      const userData = JSON.parse(localStorage.getItem("user"));
+      setUser(userData);
+      localStorage.setItem("user", JSON.stringify(userData));
     } catch (err) {
-      throw new Error("Identifiants incorrects.");
+      console.error("Erreur dans AuthContext  login()", err.response?.data || err.message);
+      throw new Error("Échec de la connexion.");
     }
   };
 
-  // Fonction pour s'inscrire
-  const register = async (email, password) => {
+  // Fonction pour s'inscrire - via API
+  const register = async (email, password, username) => {
     try {
-      // Simule une requête d'inscription (à remplacer par une vraie API)
-      const response = await axios.post("/api/register", { email, password });
-      setUser(response.data);  // Stocke l'utilisateur dans l'état
-      localStorage.setItem("user", JSON.stringify(response.data));  // Stocke l'utilisateur dans le localStorage
+      //const token = await registerService({ username, email, password});
+      const userData = { email };
+      setUser(userData);
+      localStorage.setItem("user", JSON.stringify(userData));
     } catch (err) {
-      throw new Error("Erreur lors de l'inscription.");
+      throw new Error("Échec de l'inscription.");
     }
   };
 
   // Fonction pour se déconnecter
   const logout = () => {
+    logoutService();
     setUser(null);  // Effacer l'utilisateur de l'état
     localStorage.removeItem("user");  // Supprimer l'utilisateur du localStorage
   };
@@ -49,7 +61,12 @@ export const AuthProvider = ({ children }) => {
     login,
     register,
     logout,
+    isAuthenticated: !!user,
   };
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  return (
+  <AuthContext.Provider value={value}>
+    {!loading && children}
+  </AuthContext.Provider>
+  );
 };

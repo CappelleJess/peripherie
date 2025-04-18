@@ -15,11 +15,14 @@ function Login() {
     e.preventDefault();
     setLoading(true);
     setError(null);
+    console.log("Tentative de connexion...");
 
     try {
       await login(email, password);  // Utiliser la fonction login du contexte
+      console.log("Connexion réussie, redirection...");
       navigate("/dashboard");  // Rediriger après une connexion réussie
     } catch (err) {
+      console.error("Erreur attrapée dans Login.jsx");
       setError("Identifiants incorrects.");
     } finally {
       setLoading(false);

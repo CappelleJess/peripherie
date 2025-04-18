@@ -7,16 +7,13 @@ import Footer from "./Footer";
  * Layout général : Header en haut, contenu central via <Outlet />, Footer en bas.
  * <Outlet /> = pages imbriquées (Homepage, Login, etc.)
  */
-function Layout({ isAuthenticated, setIsAuthenticated, setUser, children }) {
+function Layout() {
   return (
     <>
-      <Header isAuthenticated={isAuthenticated} setIsAuthenticated={setIsAuthenticated} setUser={setUser}/>
-
+      <Header />
       <main style={{ padding: "2rem" }}>
-        {children}
         <Outlet />
       </main>
-
       <Footer />
     </>
   );
