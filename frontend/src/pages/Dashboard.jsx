@@ -8,7 +8,7 @@ function Dashboard() {
     <div>
       <h1>Dashboard</h1>
       {user ? (
-        <p>Bienvenue, {user.username} !</p>
+        <p>Bienvenue, {user?.username || user?.email } !</p>
       ) : (
         <p>Veuillez vous connecter pour accéder à votre tableau de bord.</p>
       )}

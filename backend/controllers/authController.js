@@ -23,6 +23,7 @@ const verifyToken = (req, res, next) => {
 
 // Fonction d'inscription des utilisateurs
 const register = async (req, res) => {
+  console.log("Requête d'inscription reçue :", req.body);
   const { username, email, password } = req.body; // Récupérer les données du corps de la requête
 
   try {
@@ -57,14 +58,15 @@ const register = async (req, res) => {
     // Renvoyer une réponse avec le message et le token
     res.status(201).json({ message: 'Utilisateur créé', token });
   } catch (error) {
-    console.error(error);
+    console.error("Erreur dans register() :", error);
     res.status(500).json({ message: 'Erreur serveur' }); // Erreur interne du serveur
   }
 };
 
 // Fonction de connexion des utilisateurs
-console.log("Requête de connexion reçue: ", req.method, req.body);
+
 const login = async (req, res) => {
+  //console.log("Requête de connexion reçue: ", req.method, req.body);
   const { email, password } = req.body; // Récupérer les informations d'identification
 
   try {

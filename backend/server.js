@@ -3,6 +3,7 @@ import { config } from 'dotenv';
 import connectDB from './config/db.js';
 import authRoutes from './routes/authRoutes.js';
 import profileRoutes from './routes/profileRoutes.js';
+import cors from "cors";
 
 // Chargement des variables d'environnement depuis le fichier .env
 config();
@@ -12,6 +13,9 @@ connectDB();
 
 // Création de l'application Express
 const app = express();
+
+app.use(cors());
+app.use(express.json());
 
 // Middleware pour parser les requêtes JSON
 app.use(json());

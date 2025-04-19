@@ -1,20 +1,19 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
 import { useAuth } from "../contexts/AuthContext";
 
 function Register() {
   const [formData, setFormData] = useState({
-    name: "",
+    username:"",
     email: "",
     password: "",
     confirmPassword: "",
   });
 
   const [errors, setErrors] = useState({});
+  const [successMessage, setSuccessMessage] = useState("");
   const navigate = useNavigate();
-
-  const { login } = useAuth();
+  const { register } = useAuth();
 
   // Met à jour les champs du formulaire
   const handleChange = (e) => {
@@ -28,7 +27,7 @@ function Register() {
   const validateForm = () => {
     const formErrors = {};
 
-    if (!formData.name) formErrors.name = "Le nom est requis";
+    if (!formData.username) formErrors.username = "Le nom d'utilisateur est requis";
     if (!formData.email) formErrors.email = "L'email est requis";
     else if (!/\S+@\S+\.\S+/.test(formData.email))
       formErrors.email = "Email invalide";
@@ -46,25 +45,19 @@ function Register() {
   // Soumission du formulaire d'inscription
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     if (!validateForm()) return;
 
     try {
-      // Appel au backend (Express) pour enregistrer un nouvel utilisateur
-      const response = await axios.post("http://localhost:5000/api/register", {
-        name: formData.name,
-        email: formData.email,
-        password: formData.password,
-      });
-
-      // Stockage du token et email via le contexte d'authentification
-      login(response.data);
-      navigate("/dashboard");
+      await register(formData.username, formData.email, formData.password);
+      setSuccessMessage("Compte crée avec succès ! Redirection en cours...");
+      setTimeout(() => {
+        navigate("/dashboard");
+      }, 2000); // délai de 2s
     } catch (err) {
-      if (err.response && err.response.status === 409) {
-        setErrors({ email: "Cet email est déjà utilisé." });
+      if (err.message.includes("Email déjà utilisé")) {
+        setErrors({ email: "Cet email est déjà utilisé" });
       } else {
-        console.error(err);
+        console.error("Erreur d'inscription :", err);
         alert("Une erreur est survenue lors de l'inscription.");
       }
     }
@@ -73,48 +66,29 @@ function Register() {
   return (
     <div>
       <h1>Inscription</h1>
+      {successMessage && <p style={{ color: "green" }}>{successMessage}</p>}
       <form onSubmit={handleSubmit}>
         <div>
-          <label>Nom</label>
-          <input
-            type="text"
-            name="name"
-            value={formData.name}
-            onChange={handleChange}
-          />
-          {errors.name && <p>{errors.name}</p>}
+          <label>Nom d'utilisateur</label>
+          <input type="text" name="username" value={formData.username} onChange={handleChange}/>
+          {errors.username && <p>{errors.username}</p>}
         </div>
 
         <div>
           <label>Email</label>
-          <input
-            type="email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-          />
+          <input type="email" name="email" value={formData.email} onChange={handleChange}/>
           {errors.email && <p>{errors.email}</p>}
         </div>
 
         <div>
           <label>Mot de passe</label>
-          <input
-            type="password"
-            name="password"
-            value={formData.password}
-            onChange={handleChange}
-          />
+          <input type="password" name="password" value={formData.password} onChange={handleChange}/>
           {errors.password && <p>{errors.password}</p>}
         </div>
 
         <div>
           <label>Confirmer le mot de passe</label>
-          <input
-            type="password"
-            name="confirmPassword"
-            value={formData.confirmPassword}
-            onChange={handleChange}
-          />
+          <input type="password" name="confirmPassword" value={formData.confirmPassword} onChange={handleChange}/>
           {errors.confirmPassword && <p>{errors.confirmPassword}</p>}
         </div>
 

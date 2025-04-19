@@ -11,13 +11,19 @@ export const register = async ({ username, email, password }) => {
 // Connexion via backend
 export const login = async ({ email, password }) => {
         console.log("authService → envoi à l'API login");
-    const res = await api.post("/auth/login", { email, password });
+    try {
+        const res = await api.post("/auth/login", { email, password });
         console.log("authService → réponse reçue", res.data);
-    const { token, username, email: returnedEmail } = res.data;
+        
+        const { token, username, email: returnedEmail } = res.data;
+        localStorage.setItem("token", token);
+        localStorage.setItem("user", JSON.stringify({ username, email: returnedEmail }));
 
-    localStorage.setItem("token", token);
-    localStorage.setItem("user", JSON.stringify({ username, email: returnedEmail }));
-    return token;
+    return token;    
+    } catch (error) {
+        console.error("authService -> ERREUR", error.respond?.data || error.message);
+        throw error;
+    }
 };
 
 // Déconnexion

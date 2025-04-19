@@ -1,5 +1,6 @@
 import React from "react";
 import { Routes, Route } from "react-router-dom";
+import PublicRoute from "./components/PublicRoute";
 
 import Homepage from "./pages/Homepage";
 import Login from "./pages/Login";
@@ -17,8 +18,8 @@ function App() {
     <Routes>
       <Route element={<Layout />}>
         <Route index element={<Homepage />} />
-        <Route path="login" element={<Login />} />
-        <Route path="register" element={<Register />} />
+        <Route path="login" element={<PublicRoute element={<Login />} />} />
+        <Route path="register" element={<PublicRoute element={<Register />} />} />
 
         {/* Routes protégées */}
         <Route

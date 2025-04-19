@@ -22,8 +22,10 @@ function Login() {
       console.log("Connexion réussie, redirection...");
       navigate("/dashboard");  // Rediriger après une connexion réussie
     } catch (err) {
-      console.error("Erreur attrapée dans Login.jsx");
-      setError("Identifiants incorrects.");
+      //console.error("Erreur attrapée dans Login.jsx");
+      //setError("Identifiants incorrects.");
+      console.error("Erreur attrapée dans Login.jsx: ", err);
+      setError(err.response?.data?.message || "Erreur inconnue");
     } finally {
       setLoading(false);
     }
