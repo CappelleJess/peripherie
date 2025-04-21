@@ -1,7 +1,23 @@
-import React from "react";
+import React, { useState } from "react";
+import IntroTerminal from "../components/IntroTerminal";
 
 function Homepage() {
-  return <h1>Bienvenue sur la page d’accueil</h1>;
+  const [introDone, setIntroDone] = useState(false);
+
+
+  return (
+    <>
+      {!introDone ? (
+        <IntroTerminal onFinish={() => setIntroDone(true)} />
+      ) : (
+          <main>
+            <h1>Bienvenue dans Périphérie</h1>
+            <p>Explorez les souvenirs perdus d’un passé qui s’efface.</p>
+            {/* contenu principal */}
+          </main>
+      )}
+    </>
+  );
 }
 
 export default Homepage;

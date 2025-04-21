@@ -65,7 +65,7 @@ function Register() {
 
   return (
     <div>
-      <h1>Inscription</h1>
+      <h1>Inscription<span className="cursor"></span></h1>
       {successMessage && <p style={{ color: "green" }}>{successMessage}</p>}
       <form onSubmit={handleSubmit}>
         <div>

@@ -21,6 +21,7 @@ function Login() {
       await login(email, password);  // Utiliser la fonction login du contexte
       console.log("Connexion réussie, redirection...");
       navigate("/dashboard");  // Rediriger après une connexion réussie
+      //navigate("/");
     } catch (err) {
       //console.error("Erreur attrapée dans Login.jsx");
       //setError("Identifiants incorrects.");
@@ -33,7 +34,7 @@ function Login() {
 
   return (
     <div>
-      <h1>Connexion</h1>
+      <h1>Connexion<span className="cursor"></span></h1>
       <form onSubmit={handleSubmit}>
         <div>
           <label>Email : </label>

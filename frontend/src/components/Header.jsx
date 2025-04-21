@@ -1,53 +1,72 @@
-import React from "react";
+import React/*, { useState }*/ from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 
 function Header() { 
   const { isAuthenticated, logout } = useAuth();
   const navigate = useNavigate(); // Hook pour naviguer dynamiquement
+  // const [showMenu, setShowMenu] = useState(false);
 
   const handleLogout = () => {
-    // Supprimer les données de l'utilisateur simulé
     logout();
     navigate("/");
 };
 
-  //   // Réinitialiser les états globaux
-  //   setIsAuthenticated(false);
-  //   setUser(null);
-
-  //   // Rediriger vers la page d'accueil
-  //   navigate("/");
-  // };
-
   return (
-    <header style={{ padding: "1rem", background: "#eee" }}>
-      <nav style={{ display: "flex", gap: "1rem" }}>
-        {/* Lien toujours visible */}
-        <NavLink
-          to="/"
-          style={({ isActive }) => ({
-            fontWeight: isActive ? "bold" : "normal",
-            textDecoration: isActive ? "underline" : "none",
-          })}
-        >
-          Accueil
+    <header className="custom-header">
+      <div className="header-content">
+        <NavLink to="/">
+          <div className="logo">
+            <img src="/img/logo_glitch_mini.gif" alt="Logo Périphérie" className="logo-img" />
+          </div>
         </NavLink>
 
-        {!isAuthenticated ? (
-          <>
-            <NavLink to="/login">Connexion</NavLink>
-            <NavLink to="/register">Inscription</NavLink>
-          </>
-        ) : (
-          <>
-            <NavLink to="/profile">Profil</NavLink>
-            <NavLink to="/dashboard">Dashboard</NavLink>
-            <NavLink to="/settings">Paramètres</NavLink>
-            <button onClick={handleLogout}>Déconnexion</button>
-          </>
-        )}
-      </nav>
+        <nav className="nav-links">
+          {!isAuthenticated ? ( 
+            <>
+              <NavLink to="/">Accueil</NavLink>
+              <NavLink to="/play">Jouer</NavLink>
+              <NavLink to="/gameuniverse">Univers du jeu</NavLink>
+              <NavLink to="/news">Actualites</NavLink>
+              <NavLink to="/login">Connexion</NavLink>
+              <NavLink to="/register">Inscription</NavLink>
+            </>
+          ) : (
+            <>
+              <NavLink to="/">Accueil</NavLink>
+              <NavLink to="/play">Jouer</NavLink>
+              <NavLink to="/gameuniverse">Univers du jeu</NavLink>
+              <NavLink to="/news">Actualites</NavLink>
+              <NavLink to="/dashboard">Dashboard</NavLink>
+              <button onClick={handleLogout}>Déconnexion</button>
+            </>
+          )}
+        </nav>
+
+        {/* <button
+          className="menu-button"
+          onClick={() => setShowMenu(!showMenu)}
+        >
+          ≡
+        </button> */}
+      </div>
+
+      {/* {showMenu && (
+        <div className="dropdown-menu">
+          {!isAuthenticated ? (
+            <>
+              <NavLink to="/login">Connexion</NavLink>
+              <NavLink to="/register">Inscription</NavLink>
+            </>
+          ) : (
+            <>
+              <NavLink to="/dashboard">Dashboard</NavLink>
+              <NavLink to="/settings">Paramètres</NavLink>
+              <button onClick={handleLogout}>Déconnexion</button>
+            </>
+          )}
+        </div>
+      )} */}
     </header>
   );
 }
