@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import FenetreRetro from './FenetreRetro';
 import ProfilUser from './ProfilUser';
 import Souvenirs from './Souvenirs';
@@ -6,6 +6,23 @@ import Souvenirs from './Souvenirs';
 const DashboardContainer = () => {
   // État pour gérer les fenêtres ouvertes
   const [fenetres, setFenetres] = useState([]);
+
+  // État pour gérer le profil et son setter
+  const [profil, setProfil] = useState(null);
+
+  // Charger les données du profil utilisateur
+  useEffect(() => {
+    const token = localStorage.getItem('token'); // si besoin d'auth
+    fetch('/api/profile', {
+      headers: { 'Authorization': `Bearer ${token}` }
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error('Non authentifié');
+        return res.json();
+      })
+      .then(setProfil)      
+      .catch((err) => console.error("Erreur de chargement du profil :", err));
+  }, []);
 
   // Fonction pour ouvrir une fenêtre (si elle n'est pas déjà ouverte)
   const ouvrirFenetre = (type) => {
@@ -25,20 +42,20 @@ const DashboardContainer = () => {
   };
 
   // Exemple fictif de profil
-const profilFictif = {
-    displayName: "EchoPlayer",
-    souvenirScore: 42,
-    lienPNJ: "fort",
-    ancragePasse: "modéré",
-    score: 88,
-    lastLoginDate: "2025-04-19T13:15:00Z"
-  };
+  // const profil = {
+  //   displayName: "EchoPlayer",
+  //   souvenirScore: 42,
+  //   lienPNJ: "fort",
+  //   ancragePasse: "modéré",
+  //   score: 88,
+  //   lastLoginDate: "2025-04-19T13:15:00Z"
+  // };
 
   // Rendu du contenu selon le type
     const getContenu = (type) => {
         switch (type) {
             case "profil":
-        return <ProfilUser profile={profilFictif} />;
+        return <ProfilUser profile={profil} />;
             case "souvenirs":
         return <Souvenirs />;
             default:
