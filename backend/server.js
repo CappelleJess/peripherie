@@ -4,6 +4,7 @@ import cors from 'cors';
 import connectDB from './config/db.js';
 import authRoutes from './routes/authRoutes.js';
 import profileRoutes from './routes/profileRoutes.js';
+import gameRoutes from './routes/gameRoutes.js';
 
 config();
 connectDB();
@@ -32,6 +33,8 @@ app.use('/api/profile', (req, res, next) => {
   console.log('➡️  Appel à /api/profile');
   next();
 }, profileRoutes);
+
+app.use('/api', gameRoutes);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {

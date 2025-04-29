@@ -1,0 +1,107 @@
+{
+  "client": "Thunder Client",
+  "collectionName": "Peripherie API Tests",
+  "dateExported": "2025-04-29",
+  "version": "1.1",
+  "requests": [
+    {
+      "name": "Backend Test",
+      "method": "GET",
+      "url": "http://localhost:5000/api/test",
+      "headers": [],
+      "body": {}
+    },
+    {
+      "name": "Register User",
+      "method": "POST",
+      "url": "http://localhost:5000/api/auth/register",
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" }
+      ],
+      "body": {
+        "type": "json",
+        "raw": {
+          "username": "userTest",
+          "email": "usertest@example.com",
+          "password": "test1234"
+        }
+      }
+    },
+    {
+      "name": "Login User",
+      "method": "POST",
+      "url": "http://localhost:5000/api/auth/login",
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" }
+      ],
+      "body": {
+        "type": "json",
+        "raw": {
+          "email": "usertest@example.com",
+          "password": "test1234"
+        }
+      }
+    },
+    {
+      "name": "Get Profile",
+      "method": "GET",
+      "url": "http://localhost:5000/api/profile",
+      "headers": [
+        { "name": "Authorization", "value": "Bearer {{token}}" }
+      ],
+      "body": {}
+    },
+    {
+      "name": "Update Profile",
+      "method": "PUT",
+      "url": "http://localhost:5000/api/profile/{{userId}}",
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" },
+        { "name": "Authorization", "value": "Bearer {{token}}" }
+      ],
+      "body": {
+        "type": "json",
+        "raw": {
+          "displayName": "NewName",
+          "avatar": "newavatar.png"
+        }
+      }
+    },
+    {
+      "name": "Get Game Progress",
+      "method": "GET",
+      "url": "http://localhost:5000/api/game/progress/{{userId}}",
+      "headers": [],
+      "body": {}
+    },
+    {
+      "name": "Save Player Choice",
+      "method": "POST",
+      "url": "http://localhost:5000/api/game/choices/{{userId}}",
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" }
+      ],
+      "body": {
+        "type": "json",
+        "raw": {
+          "choice": "Prendre la clé",
+          "impactOnStory": "Débloque la porte"
+        }
+      }
+    },
+    {
+      "name": "Update Game Scores",
+      "method": "PUT",
+      "url": "http://localhost:5000/api/game/scores/{{userId}}",
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" }
+      ],
+      "body": {
+        "type": "json",
+        "raw": {
+          "souvenirScore": 88
+        }
+      }
+    }
+  ]
+}

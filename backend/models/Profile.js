@@ -15,6 +15,10 @@ const profileSchema = new mongoose.Schema({
     type: String,
     default: '',
   },
+  choices: [{
+    choice: String,
+    impactOnStory: String
+  }],
   souvenirScore: {
     type: Number,
     default: 0,
@@ -30,6 +34,10 @@ const profileSchema = new mongoose.Schema({
   score: {
     type: Number,
     default: 0,
+  },
+  currentLevel: {
+    type: Number,
+    default: 1
   },
   lastLoginDate: {
     type: Date,
