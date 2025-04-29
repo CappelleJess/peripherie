@@ -48,7 +48,7 @@ function Register() {
     if (!validateForm()) return;
 
     try {
-      await register(formData.username, formData.email, formData.password);
+      await register({ username: formData.username, email: formData.email, password: formData.password });
       setSuccessMessage("Compte crée avec succès ! Redirection en cours...");
       setTimeout(() => {
         navigate("/dashboard");

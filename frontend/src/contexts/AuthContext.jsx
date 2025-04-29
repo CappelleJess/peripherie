@@ -25,28 +25,30 @@ export const AuthProvider = ({ children }) => {
   const login = async (email, password) => {
     console.log("AuthContext + login()", email, password);
     try {
-      await loginService({ email, password });
-      // Décodage du token si besoin pour stocker infos utilisateur
-      const userData = JSON.parse(localStorage.getItem("user"));
-      setUser(userData);
-      //localStorage.setItem("user", JSON.stringify(userData));
+
+      
+      const { token, user } = await loginService({ email, password });
+      
+        localStorage.setItem("token", token);
+        localStorage.setItem("user", JSON.stringify(user));
+        setUser(user);
     } catch (err) {
-      //console.error("Erreur dans AuthContext  login()", err.response?.data || err.message);
-      //throw new Error("Échec de la connexion.");
       console.error("AuthContext -> erreur login: ", err.response?.data || err.message);
       throw err;
     }
   };
 
   // Fonction pour s'inscrire - via API
-  const register = async (username, email, password) => {
+  const register = async ({ username, email, password }) => {
     try {
-      await registerService({ username, email, password});
-      const userData = { username, email };
-      setUser(userData);
-      localStorage.setItem("user", JSON.stringify(userData));
+      const { token, user } = await registerService({ username, email, password });
+  
+      localStorage.setItem("token", token);
+      localStorage.setItem("user", JSON.stringify(user));
+      setUser(user);
     } catch (err) {
-      throw new Error("Échec de l'inscription.");
+      console.error("Erreur backend register():", err.response?.data || err.message);
+      throw new Error(err.response?.data?.message || "Échec de l'inscription.");
     }
   };
 

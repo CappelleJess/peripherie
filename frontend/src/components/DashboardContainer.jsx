@@ -12,19 +12,38 @@ const DashboardContainer = () => {
 
   // Charger les données du profil utilisateur
   useEffect(() => {
-    const token = localStorage.getItem('token'); // si besoin d'auth
-    fetch('/api/profile', {
-      headers: { 'Authorization': `Bearer ${token}` }
+    const token = localStorage.getItem('token');
+    console.log("Token détecté dans DashboardContainer :", token);
+  
+    if (!token) {
+      console.warn("Aucun token trouvé, utilisateur non connecté.");
+      return;
+    }
+  
+    fetch('http://localhost:5000/api/profile', {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
     })
       .then((res) => {
-        if (!res.ok) throw new Error('Non authentifié');
+        if (res.status === 404) {
+          throw new Error("Route non trouvée (404)");
+        }
+        if (!res.ok) {
+          throw new Error("Non authentifié ou erreur serveur");
+        }
         return res.json();
       })
-      .then(setProfil)      
-      .catch((err) => console.error("Erreur de chargement du profil :", err));
+      .then(data => {
+        console.log("Profil chargé :", data);
+        setProfil(data);
+      })
+      .catch((err) => {
+        console.error("Erreur de chargement du profil :", err.message);
+      });
   }, []);
-
-  // Fonction pour ouvrir une fenêtre (si elle n'est pas déjà ouverte)
+  
   const ouvrirFenetre = (type) => {
     if (!fenetres.find(f => f.type === type)) {
       const nouvelleFenetre = {

@@ -1,7 +1,8 @@
 import express from 'express';
 import { getAllProfiles, getMyProfile, updateMyProfile, deleteMyProfile } from '../controllers/profileController.js';
-import { verifyToken } from '../controllers/authController.js';
 import { isAdmin } from '../middleware/isAdmin.js';
+import { verifyToken } from '../middleware/verifyToken.js';
+
 
 const router = express.Router();
 

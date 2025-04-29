@@ -1,44 +1,39 @@
-import express, { json } from 'express'; 
-import { config } from 'dotenv'; 
+import express from 'express';
+import { config } from 'dotenv';
+import cors from 'cors';
 import connectDB from './config/db.js';
 import authRoutes from './routes/authRoutes.js';
 import profileRoutes from './routes/profileRoutes.js';
-import cors from "cors";
 
-// Chargement des variables d'environnement depuis le fichier .env
 config();
-
-// Connexion à la base de données MongoDB
 connectDB();
 
-// Création de l'application Express
 const app = express();
 
-app.use(cors());
+app.use(cors({
+  origin: 'http://localhost:3000',
+  credentials: true
+}));
+
 app.use(express.json());
 
-// Middleware pour parser les requêtes JSON
-app.use(json());
+// Route de test
+app.get('/api/test', (req, res) => {
+  res.json({ message: '✅ Backend opérationnel' });
+});
 
-// Utiliser les routes d'authentification
+// Routes principales
 app.use('/api/auth', (req, res, next) => {
-  console.log('Routing request to /api/auth');
+  console.log('➡️  Appel à /api/auth');
   next();
 }, authRoutes);
 
-// Utiliser les routes de profils
 app.use('/api/profile', (req, res, next) => {
-  console.log('Routing request to /api/profile');
+  console.log('➡️  Appel à /api/profile');
   next();
 }, profileRoutes);
 
-// Route simple pour tester
-app.get('/', (req, res) => {
-  res.send('Bienvenue sur le backend de Périphérie !');
-});
-
-// Démarrage du serveur
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-  console.log(`Serveur démarré sur le port ${PORT}`);
+  console.log(`🚀 Serveur backend lancé sur http://localhost:${PORT}`);
 });
