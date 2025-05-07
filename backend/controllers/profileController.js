@@ -12,7 +12,7 @@ export const getAllProfiles = async (req, res) => {
 
 // Obtenir le profil de l'utilisateur connecté
 export const getMyProfile = async (req, res) => {
-  console.log("✅ Token décodé utilisateur :", req.user);
+  console.log("Token décodé utilisateur :", req.user);
   try {
     const profile = await Profile.findOne({ user: req.user.userId });
     if (!profile) {

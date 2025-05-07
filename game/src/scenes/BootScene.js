@@ -7,9 +7,11 @@ export default class BootScene extends Phaser.Scene {
 
   preload() {
     this.load.image('menu-bg', 'assets/backgrounds/menu-bg.png');
-    this.load.audio('menu-music', 'assets/musics/menu-music.mp3');
-    this.load.image('room', 'assets/backgrounds/room-bg.png');
-    this.load.image('flower', 'assets/symbols/flower.png');
+    //this.load.audio('menu-music', 'assets/audio/menu-music.mp3');
+    this.load.image('room', 'assets/backgrounds/room.png');
+    this.load.image('flower', 'assets/images/flower.png');
+    this.load.image('frame', 'assets/images/frame.png');
+    this.load.image('book', 'assets/images/book.png');
   }
 
   create() {

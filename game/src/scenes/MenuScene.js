@@ -10,13 +10,13 @@ export default class MenuScene extends Phaser.Scene {
     this.add.image(400, 300, 'menu-bg').setOrigin(0.5);
 
     // Musique d'ambiance (ne pas relancer si déjà jouée)
-    if (!this.sound.get('menu-music')) {
+    /*if (!this.sound.get('menu-music')) {
       const music = this.sound.add('menu-music', {
         volume: 0.2,
         loop: true
       });
       music.play();
-    }
+    }*/
 
     // Titre du jeu
     this.add.text(400, 200, 'Périphérie', {

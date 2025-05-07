@@ -1,5 +1,5 @@
 export default {
     souvenirScore: 0,
-    lienPNJ: 0,
+    emergenceNostalgie: 0,
     ancragePasse: 0
   };

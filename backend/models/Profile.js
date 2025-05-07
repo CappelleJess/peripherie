@@ -27,7 +27,7 @@ const profileSchema = new mongoose.Schema({
     type: Number,
     default: 0,
   },
-  lienPNJ: {
+  emergenceNostalgie: {
     type: Number,
     default: 0,
   },
