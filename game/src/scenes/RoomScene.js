@@ -1,64 +1,76 @@
 import Phaser from 'phaser';
 import GameState from '../data/GameState';
-import { createFlower, createFrame, createBook } from './interactiveItems';
-import { showFlowerDialogue } from './dialogues';
+import { createMemoryObject } from './createMemoryObject';
 
 export default class RoomScene extends Phaser.Scene {
   constructor() {
     super('RoomScene');
   }
 
-  // Chargement des assets (icônes)
   preload() {
+    this.load.image('flower', 'assets/images/flower.png');
+    this.load.image('flower_glow', 'assets/images/flower_glow.png');
     this.load.image('icon_examine', 'assets/images/icon_examine.png');
     this.load.image('icon_smell', 'assets/images/icon_smell.png');
     this.load.image('icon_ignore', 'assets/images/icon_ignore.png');
   }
 
   create() {
-    // Affiche le décor de la pièce
-    this.add.image(400, 300, 'room').setOrigin(0.5, 0.5);
+    this.add.image(400, 300, 'room').setOrigin(0.5);
 
-    // Création des textes pour les scores
     this.souvenirText = this.add.text(20, 20, `Souvenirs : ${GameState.souvenirScore}`, {
       fontSize: '20px',
       fill: '#ffffff'
     });
-    
+
     this.ancrageText = this.add.text(20, 50, `Ancrage : ${GameState.ancragePasse}`, {
       fontSize: '20px',
       fill: '#ffffff'
     });
-    
+
     this.nostalgieText = this.add.text(20, 80, `Nostalgie : ${GameState.emergenceNostalgie}`, {
       fontSize: '20px',
       fill: '#ffffff'
     });
 
-    // Création des objets interactifs avec leurs interactions
-    const flower = createFlower(this, 600, 400, this.souvenirText, this.ancrageText, this.nostalgieText);
-    const frame = createFrame(this, 500, 250, this.souvenirText);
-    const book = createBook(this, 300, 400, this.souvenirText);
-
-    // Clique : ouvrir la boîte de dialogue complète (si pas déjà interagi)
-    flower.on('pointerdown', () => {
-      if (GameState.interactions.flower === null) {
-        showFlowerDialogue(this, flower, this.souvenirText, this.ancrageText, this.nostalgieText);
-      }
-    });
-
-    // Survol : afficher le dialogue résumé si déjà interagi
-    flower.on('pointerover', () => {
-      if (GameState.interactions.flower !== null) {
-        showFlowerDialogue(this, flower, this.souvenirText, this.ancrageText, this.nostalgieText);
+    // Création d'un objet mémoire générique : flower
+    createMemoryObject(this, {
+      key: 'flower',
+      sprite: 'flower',
+      x: 600,
+      y: 400,
+      scale: 1,
+      choices: {
+        examine: {
+          text: "Cette fleur te rappelle un souvenir agréable de l’époque où tout semblait plus simple.",
+          scores: { souvenir: 1, ancrage: 1, nostalgie: 1 }
+        },
+        smell: {
+          text: "L'odeur de la fleur t'envahit, apportant avec elle des souvenirs chaleureux mais lourds.",
+          scores: { souvenir: 2, ancrage: 2 }
+        },
+        ignore: {
+          text: "Tu détournes le regard, préférant éviter de raviver ce souvenir.",
+          scores: { ancrage: -1 }
+        }
       }
     });
   }
-  
-  // Fonction MàJ l'affichage des scores
+
+  update() {
+    if (this.memoryObjects) {
+      this.memoryObjects.forEach(({ object, halo }) => {
+        if (halo) {
+          halo.x = object.x;
+          halo.y = object.y;
+        }
+      });
+    }
+  }
+
   updateScoreDisplay() {
     this.souvenirText.setText(`Souvenirs : ${GameState.souvenirScore}`);
     this.ancrageText.setText(`Ancrage : ${GameState.ancragePasse}`);
     this.nostalgieText.setText(`Nostalgie : ${GameState.emergenceNostalgie}`);
   }
-}
+} 

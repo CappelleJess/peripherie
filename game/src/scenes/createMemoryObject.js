@@ -16,10 +16,23 @@ export function createMemoryObject(scene, config) {
   // Ajoute un halo après interaction
   function addHalo() {
     if (halo) return;
-    halo = scene.add.circle(object.x, object.y, object.displayWidth / 2 + 5, 0xffff66, 0.3).setDepth(-1);
+  
+    const haloKey = `${sprite}_glow`;
+    if (!scene.textures.exists(haloKey)) {
+      console.warn(`Texture ${haloKey} non chargée`);
+      return;
+    }
+  
+    halo = scene.add.image(object.x, object.y, haloKey)
+      .setScale(object.scale * 1.2)
+      .setAlpha(0.7)
+      .setDepth(object.depth + 1);
+  
+    if (!scene.memoryObjects) scene.memoryObjects = [];
+    scene.memoryObjects.push({ object, halo });
   }
 
-  // MàJ du texte de score
+  // MàJ texte de score
   function updateScores(scores) {
     if (scores.souvenir) GameState.souvenirScore += scores.souvenir;
     if (scores.ancrage) GameState.ancragePasse += scores.ancrage;
@@ -27,10 +40,10 @@ export function createMemoryObject(scene, config) {
     scene.updateScoreDisplay();
   }
 
-  // Dialogue unique après interaction
+  // Dialogue souvenir après interaction
   function showMemoryText(choiceKey) {
     const msg = choices[choiceKey].text;
-    const boxY = object.y - object.displayHeight / 2 - 30;
+    const boxY = object.y - object.displayHeight / 2 - 60;
 
     const box = scene.add.rectangle(object.x, boxY, 400, 100, 0x000000, 1).setOrigin(0.5);
     const text = scene.add.text(object.x, boxY, msg, {
@@ -46,9 +59,10 @@ export function createMemoryObject(scene, config) {
   // Dialogue complet avec icônes
   function showFullDialogue() {
     isDialogueOpen = true;
+    GameState.dialogueOpen = true;
 
     const dialogueBox = scene.add.rectangle(400, 200, 400, 200, 0x000000, 1).setOrigin(0.5);
-    const dialogueText = scene.add.text(400, 180, `C'est un objet mémoriel`, {
+    const dialogueText = scene.add.text(400, 180, `Un brin de myosotis...`, {
       fontSize: '18px', fill: '#ffffff', wordWrap: { width: 380 }
     }).setOrigin(0.5);
 
@@ -60,16 +74,23 @@ export function createMemoryObject(scene, config) {
 
     for (const [key, btn] of Object.entries(buttons)) {
       btn.on('pointerdown', () => {
-        GameState.interactions[key] = key;
+        scene.tweens.add({
+          targets: btn,
+          scale: btn.scale * 0.9,
+          yoyo: true,
+          duration: 100
+        });
+
+        GameState.interactions[sprite] = key;
         disableAll();
         dialogueText.setText(choices[key].text);
         updateScores(choices[key].scores);
-        GameState.interactions[sprite] = key; // enregistre le choix
         addHalo();
 
         scene.time.delayedCall(2000, () => {
           destroyAll();
           isDialogueOpen = false;
+          GameState.dialogueOpen = false;
         });
       });
     }
@@ -88,25 +109,31 @@ export function createMemoryObject(scene, config) {
       if (isDialogueOpen) {
         destroyAll();
         isDialogueOpen = false;
+        GameState.dialogueOpen = false;
       }
     });
   }
 
-  // CLIC -> ouvrir boîte de dialogue si pas encore choisi
   object.on('pointerdown', () => {
     if (isDialogueOpen) return;
     if (!GameState.interactions[sprite]) {
+      // Animation du clic
+      scene.tweens.add({
+        targets: object,
+        scale: object.scale * 0.9,
+        yoyo: true,
+        duration: 120
+      });
       showFullDialogue();
     }
   });
 
-  // SURVOL -> afficher choix fait
   object.on('pointerover', () => {
     const choice = GameState.interactions[sprite];
-    if (choice) {
+    if (choice && !GameState.dialogueOpen) {
       showMemoryText(choice);
     }
   });
 
   return object;
-}
+} 
