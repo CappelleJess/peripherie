@@ -1,4 +1,4 @@
-import GameState from '../data/GameState';
+/*import GameState from '../src/data/GameState';
 
 export function showFlowerDialogue(scene, flower, souvenirText, ancrageText, nostalgieText) {
   const priorChoice = GameState.interactions.flower;
@@ -122,4 +122,4 @@ export function showFlowerDialogue(scene, flower, souvenirText, ancrageText, nos
       closeDialogue();
     }, 2000);
   });
-}
+}*/

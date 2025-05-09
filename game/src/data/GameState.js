@@ -7,7 +7,10 @@ const GameState = {
     flower: null, // examine, smell, ignore
     frame: null,
     book: null
-  }
+  },
+
+  dialogueOpen: false,
+  objectsInteracted: 0
 };
 
 export default GameState;

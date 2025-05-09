@@ -1,5 +1,17 @@
 import GameState from '../data/GameState';
 
+/**
+ * Crée un objet mémoire interactif dans la scène
+ * @param {Phaser.Scene} scene - La scène active
+ * @param {Object} config - Configuration de l’objet mémoire
+ * @param {string} config.key - ID unique (ex : 'flower')
+ * @param {string} config.sprite - Nom du sprite affiché
+ * @param {number} config.x - Position X
+ * @param {number} config.y - Position Y
+ * @param {number} config.scale - Échelle de l’image
+ * @param {Object} config.choices - Choix interactifs (examine, smell, ignore)
+ */
+
 export function createMemoryObject(scene, config) {
   const {
     key,          // ex: 'flower'
@@ -9,7 +21,10 @@ export function createMemoryObject(scene, config) {
     choices       // dictionnaire { examine: {text, scores}, ... }
   } = config;
 
-  const object = scene.add.image(x, y, sprite).setInteractive({ useHandCursor: true }).setScale(scale);
+  const object = scene.add.image(x, y, sprite)
+    .setInteractive({ useHandCursor: true })
+    .setScale(scale);
+
   let isDialogueOpen = false;
   let halo = null;
 
@@ -24,7 +39,7 @@ export function createMemoryObject(scene, config) {
     }
   
     halo = scene.add.image(object.x, object.y, haloKey)
-      .setScale(object.scale * 1.2)
+      .setScale(object.scale)
       .setAlpha(0.7)
       .setDepth(object.depth + 1);
   
@@ -51,8 +66,16 @@ export function createMemoryObject(scene, config) {
     }).setOrigin(0.5);
 
     scene.time.delayedCall(2000, () => {
-      box.destroy();
-      text.destroy();
+      scene.tweens.add({
+        targets: [box, text],
+        alpha: 0,
+        duration: 500,
+        ease:'Power1',
+        onComplete: () => {
+          box.destroy();
+          text.destroy();
+        }
+      })
     });
   }
 
@@ -87,6 +110,9 @@ export function createMemoryObject(scene, config) {
         updateScores(choices[key].scores);
         addHalo();
 
+        // Marque l’objet comme interagi
+        GameState.objectsInteracted = (GameState.objectsInteracted || 0) +1;
+
         scene.time.delayedCall(2000, () => {
           destroyAll();
           isDialogueOpen = false;
@@ -100,9 +126,17 @@ export function createMemoryObject(scene, config) {
     }
 
     function destroyAll() {
-      dialogueBox.destroy();
-      dialogueText.destroy();
-      Object.values(buttons).forEach(btn => btn.destroy());
+      const allElements = [dialogueBox, dialogueText, ...Object.values(buttons)];
+    
+      scene.tweens.add({
+        targets: allElements,
+        alpha: 0,
+        duration: 400,
+        ease: 'Power1',
+        onComplete: () => {
+          allElements.forEach(el => el.destroy());
+        }
+      });
     }
 
     scene.time.delayedCall(10000, () => {
@@ -129,10 +163,15 @@ export function createMemoryObject(scene, config) {
   });
 
   object.on('pointerover', () => {
+    scene.input.setDefaultCursor('url(assets/images/arrow_hover.png), pointer');
     const choice = GameState.interactions[sprite];
     if (choice && !GameState.dialogueOpen) {
       showMemoryText(choice);
     }
+  });
+
+  object.on('pointerout', () => {
+    scene.input.setDefaultCursor('url(assets/images/arrow.png), pointer'); // retourne au curseur normal
   });
 
   return object;

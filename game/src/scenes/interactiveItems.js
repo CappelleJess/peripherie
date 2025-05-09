@@ -1,4 +1,16 @@
-import Phaser from 'phaser';
+// À utiliser pour les objets non impactants
+/*export function createChair(scene, x, y) {
+  const chair = scene.add.image(x, y, 'chair')
+    .setInteractive({ useHandCursor: true });
+
+  chair.on('pointerdown', () => {
+    console.log("Tu as cliqué sur la chaise.");
+  });
+
+  return chair;
+}*/
+
+/*import Phaser from 'phaser';
 import GameState from '../data/GameState';
 
 export function createFlower(scene, x, y, souvenirText, ancrageText, nostalgieText) {
@@ -38,7 +50,7 @@ export function createFlower(scene, x, y, souvenirText, ancrageText, nostalgieTe
       scene.updateScoreDisplay(souvenirText, ancrageText, nostalgieText);
   
       // Création d’un texte temporaire pour le +1
-      /*const tempText = scene.add.text(flower.x, flower.y - 50, '+1 souvenir', {
+      const tempText = scene.add.text(flower.x, flower.y - 50, '+1 souvenir', {
         fontSize: '18px',
         fill: '#ffffff'
       }).setOrigin(0.5).setAlpha(1);
@@ -53,7 +65,7 @@ export function createFlower(scene, x, y, souvenirText, ancrageText, nostalgieTe
         onComplete: () => {
           tempText.destroy(); // Nettoyage après animation
         }
-      });*/
+      });
   
       console.log('souvenirScore:', GameState.souvenirScore);
     });
@@ -86,7 +98,7 @@ export function createFrame(scene, x, y, souvenirText) {
       souvenirText.setText(`Souvenirs : ${GameState.souvenirScore}`);
   
       // Création d’un texte temporaire pour le +2
-      /*const tempText = scene.add.text(frame.x, frame.y - 50, '+2 souvenir', {
+      const tempText = scene.add.text(frame.x, frame.y - 50, '+2 souvenir', {
         fontSize: '18px',
         fill: '#ffffff'
       }).setOrigin(0.5).setAlpha(1);
@@ -101,7 +113,7 @@ export function createFrame(scene, x, y, souvenirText) {
         onComplete: () => {
           tempText.destroy(); // Nettoyage après animation
         }
-      });*/
+      });
   
       console.log('souvenirScore:', GameState.souvenirScore);
     });
@@ -134,7 +146,7 @@ export function createBook(scene, x, y, souvenirText) {
       souvenirText.setText(`Souvenirs : ${GameState.souvenirScore}`);
   
       // Création d’un texte temporaire pour le +3
-      /*const tempText = scene.add.text(book.x, book.y - 50, '+3 souvenir', {
+      const tempText = scene.add.text(book.x, book.y - 50, '+3 souvenir', {
         fontSize: '18px',
         fill: '#ffffff'
       }).setOrigin(0.5).setAlpha(1);
@@ -149,10 +161,10 @@ export function createBook(scene, x, y, souvenirText) {
         onComplete: () => {
           tempText.destroy(); // Nettoyage après animation
         }
-      });*/
+      });
   
     console.log('souvenirScore:', GameState.souvenirScore);
   });
   
     return book;
-}
+}*/
