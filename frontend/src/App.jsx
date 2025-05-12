@@ -15,8 +15,11 @@ import Layout from "./components/Layout";
 import PublicRoute from "./components/PublicRoute";
 import PrivateRoute from "./components/PrivateRoute";
 
+import { ToastContainer } from 'react-toastify';
+
 function App() {
   return (
+    <>
     <Routes>
       <Route element={<Layout />}>
         <Route index element={<Homepage />} />
@@ -36,6 +39,8 @@ function App() {
         <Route path="*" element={<NotFound />} />
       </Route>
     </Routes>
+    <ToastContainer />
+    </>
   );
 }
 

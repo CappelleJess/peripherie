@@ -13,13 +13,7 @@ import GameState from '../data/GameState';
  */
 
 export function createMemoryObject(scene, config) {
-  const {
-    key,          // ex: 'flower'
-    sprite,       // ex: 'flower'
-    x, y,         // position
-    scale = 1,    // taille de l'objet
-    choices       // dictionnaire { examine: {text, scores}, ... }
-  } = config;
+  const { key, sprite, x, y, scale = 1, choices } = config;
 
   const object = scene.add.image(x, y, sprite)
     .setInteractive({ useHandCursor: true })
@@ -28,26 +22,24 @@ export function createMemoryObject(scene, config) {
   let isDialogueOpen = false;
   let halo = null;
 
-  // Ajoute un halo après interaction
   function addHalo() {
     if (halo) return;
-  
+
     const haloKey = `${sprite}_glow`;
     if (!scene.textures.exists(haloKey)) {
       console.warn(`Texture ${haloKey} non chargée`);
       return;
     }
-  
+
     halo = scene.add.image(object.x, object.y, haloKey)
       .setScale(object.scale)
       .setAlpha(0.7)
       .setDepth(object.depth + 1);
-  
+
     if (!scene.memoryObjects) scene.memoryObjects = [];
     scene.memoryObjects.push({ object, halo });
   }
 
-  // MàJ texte de score
   function updateScores(scores) {
     if (scores.souvenir) GameState.souvenirScore += scores.souvenir;
     if (scores.ancrage) GameState.ancragePasse += scores.ancrage;
@@ -55,7 +47,6 @@ export function createMemoryObject(scene, config) {
     scene.updateScoreDisplay();
   }
 
-  // Dialogue souvenir après interaction
   function showMemoryText(choiceKey) {
     const msg = choices[choiceKey].text;
     const boxY = object.y - object.displayHeight / 2 - 60;
@@ -70,16 +61,15 @@ export function createMemoryObject(scene, config) {
         targets: [box, text],
         alpha: 0,
         duration: 500,
-        ease:'Power1',
+        ease: 'Power1',
         onComplete: () => {
           box.destroy();
           text.destroy();
         }
-      })
+      });
     });
   }
 
-  // Dialogue complet avec icônes
   function showFullDialogue() {
     isDialogueOpen = true;
     GameState.dialogueOpen = true;
@@ -97,6 +87,7 @@ export function createMemoryObject(scene, config) {
 
     for (const [key, btn] of Object.entries(buttons)) {
       btn.on('pointerdown', () => {
+        // Animation de clic visuelle
         scene.tweens.add({
           targets: btn,
           scale: btn.scale * 0.9,
@@ -104,15 +95,32 @@ export function createMemoryObject(scene, config) {
           duration: 100
         });
 
+        // Marquer l'interaction dans GameState
         GameState.interactions[sprite] = key;
+
+        // Désactiver les autres boutons
         disableAll();
+
+        // Afficher le texte du choix
         dialogueText.setText(choices[key].text);
+
+        // Mettre à jour les scores localement
         updateScores(choices[key].scores);
+
+        // Ajouter l'effet visuel lumineux
         addHalo();
 
-        // Marque l’objet comme interagi
-        GameState.objectsInteracted = (GameState.objectsInteracted || 0) +1;
+        // Incrémenter le nombre d’objets interactés
+        GameState.objectsInteracted = (GameState.objectsInteracted || 0) + 1;
 
+        // ➕ NOUVEAU : Envoyer le choix au backend via RoomScene
+        if (typeof scene.sendPlayerChoice === 'function') {
+          const { choiceKey } = choices[key]; // clé explicite ou fallback vers key
+          const impact = choices[key].text;   // texte comme résumé d’impact
+          scene.sendPlayerChoice(choiceKey || key, impact);
+        }
+
+        // Fermer le dialogue après un délai
         scene.time.delayedCall(2000, () => {
           destroyAll();
           isDialogueOpen = false;
@@ -127,7 +135,7 @@ export function createMemoryObject(scene, config) {
 
     function destroyAll() {
       const allElements = [dialogueBox, dialogueText, ...Object.values(buttons)];
-    
+
       scene.tweens.add({
         targets: allElements,
         alpha: 0,
@@ -139,6 +147,7 @@ export function createMemoryObject(scene, config) {
       });
     }
 
+    // Sécurité : fermeture automatique après 10s si rien n’est cliqué
     scene.time.delayedCall(10000, () => {
       if (isDialogueOpen) {
         destroyAll();
@@ -148,10 +157,10 @@ export function createMemoryObject(scene, config) {
     });
   }
 
+  // Déclenche le dialogue complet si l’objet n’a pas encore été utilisé
   object.on('pointerdown', () => {
     if (isDialogueOpen) return;
     if (!GameState.interactions[sprite]) {
-      // Animation du clic
       scene.tweens.add({
         targets: object,
         scale: object.scale * 0.9,
@@ -162,6 +171,7 @@ export function createMemoryObject(scene, config) {
     }
   });
 
+  // Affiche le texte souvenir si survolé après interaction
   object.on('pointerover', () => {
     scene.input.setDefaultCursor('url(assets/images/arrow_hover.png), pointer');
     const choice = GameState.interactions[sprite];
@@ -171,8 +181,8 @@ export function createMemoryObject(scene, config) {
   });
 
   object.on('pointerout', () => {
-    scene.input.setDefaultCursor('url(assets/images/arrow.png), pointer'); // retourne au curseur normal
+    scene.input.setDefaultCursor('url(assets/images/arrow.png), pointer');
   });
 
   return object;
-} 
+}

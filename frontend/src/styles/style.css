@@ -64,6 +64,7 @@ body::after {
 .nav-links a {
   color: #d6c7ae;
   font-weight: bold;
+  text-decoration: none;
 }
 
 .nav-links a:hover {
@@ -104,6 +105,7 @@ body::after {
   border: none;
   font-family: inherit;
   font-size: 1rem;
+  text-decoration: none;
 }
 
 .dropdown-menu a:hover,
@@ -283,6 +285,39 @@ form p {
 .fenetre-retro-tab.active {
   border-bottom: 2px solid #00ff9f;
   color: #d6c7ae;
+}
+
+/* ========== FENETRE ALERT TOAST ========== */
+
+.retro-toast {
+  background-color: #1b1f3b !important;
+  color: #faf3e0 !important;
+  font-family: 'Press Start 2P', monospace !important;
+  border: 2px solid #e60073 !important;
+  box-shadow: 0 0 8px #d65a31 !important;
+  font-size: 10px !important;
+  text-align: center !important;
+  padding: 16px !important;
+}
+
+.retro-toast-body {
+  font-size: 12px !important;
+  line-height: 1.5;
+  text-align: center !important;
+}
+
+.retro-toast-progress {
+  background: linear-gradient(to right, #00ff9f, #9b5de5) !important;
+}
+
+.retro-toast .Toastify__close-button {
+  color: #faf3e0 !important;
+  opacity: 1 !important;
+  font-size: 14px;
+}
+
+.retro-toast .Toastify__close-button:hover {
+  color: #e60073 !important;
 }
 
 /* ========== RESPONSIVE ========== */

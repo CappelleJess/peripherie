@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import FenetreRetro from './FenetreRetro';
 import ProfilUser from './ProfilUser';
 import Souvenirs from './Souvenirs';
+import api from '../utils/api';
 
 const DashboardContainer = () => {
   // État pour gérer les fenêtres ouvertes
@@ -12,32 +13,10 @@ const DashboardContainer = () => {
 
   // Charger les données du profil utilisateur
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    console.log("Token détecté dans DashboardContainer :", token);
-  
-    if (!token) {
-      console.warn("Aucun token trouvé, utilisateur non connecté.");
-      return;
-    }
-  
-    fetch('http://localhost:5000/api/profile', {
-      method: 'GET',
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
-    })
-      .then((res) => {
-        if (res.status === 404) {
-          throw new Error("Route non trouvée (404)");
-        }
-        if (!res.ok) {
-          throw new Error("Non authentifié ou erreur serveur");
-        }
-        return res.json();
-      })
-      .then(data => {
-        console.log("Profil chargé :", data);
-        setProfil(data);
+    api.get('/profile')
+      .then(res => {
+        console.log("Profil chargé :", res.data);
+        setProfil(res.data);
       })
       .catch((err) => {
         console.error("Erreur de chargement du profil :", err.message);

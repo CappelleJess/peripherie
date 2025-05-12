@@ -23,10 +23,8 @@ function Login() {
       navigate("/dashboard");  // Rediriger après une connexion réussie
       //navigate("/");
     } catch (err) {
-      //console.error("Erreur attrapée dans Login.jsx");
-      //setError("Identifiants incorrects.");
       console.error("Erreur attrapée dans Login.jsx: ", err);
-      setError(err.response?.data?.message || "Erreur inconnue");
+      setError(err.response?.data?.message || "Identifiants incorrects");
     } finally {
       setLoading(false);
     }

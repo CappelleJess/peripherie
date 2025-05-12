@@ -1,5 +1,9 @@
-import React, { createContext, useState, useContext, useEffect } from "react";
+import { createContext, useState, useContext, useEffect } from "react";
 import { login as loginService, register as registerService, logout as logoutService } from "../services/authService";
+import { jwtDecode } from 'jwt-decode';
+import { useNavigate } from "react-router-dom";
+import { toast } from 'react-toastify'; 
+import 'react-toastify/dist/ReactToastify.css';
 
 // Créer un contexte pour l'authentification
 const AuthContext = createContext();
@@ -11,24 +15,49 @@ export const useAuth = () => useContext(AuthContext);
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null); // utilisateur actuel
   const [loading, setLoading] = useState(true); //chargement initial
+  const navigate = useNavigate();
 
     // Chargement initial depuis localStorage
     useEffect(() => {
       const storedUser = localStorage.getItem("user");
-      if (storedUser) {
-        setUser(JSON.parse(storedUser));
+      const token = localStorage.getItem("token");
+
+      if (storedUser && token) {
+        try {
+          const decoded = jwtDecode(token); // utilise jwtDecode
+          const now = Date.now() / 1000;
+
+          if (decoded.exp && decoded.exp < now) {
+            console.warn("Token expiré");
+            toast.info("Votre session a expiré. Veuillez vous reconnecter.", {
+            position: "top-center",
+            autoClose: 4000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: false,
+            className: 'retro-toast',
+            bodyClassName: 'retro-toast-body',
+            progressClassName: 'retro-toast-progress',
+          });
+            navigate("/login");
+            logout(); // déconnexion auto
+          } else {
+            setUser(JSON.parse(storedUser)); // token valide
+          }
+        } catch (e) {
+          console.error("Échec du décodage du token :", e);
+          logout();
+        }
       }
       setLoading(false);
-    }, []);
+    }, [navigate]);
 
   // Fonction pour se connecter/connexion via API
   const login = async (email, password) => {
     console.log("AuthContext + login()", email, password);
     try {
-
-      
       const { token, user } = await loginService({ email, password });
-      
         localStorage.setItem("token", token);
         localStorage.setItem("user", JSON.stringify(user));
         setUser(user);
