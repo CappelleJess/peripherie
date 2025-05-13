@@ -56,8 +56,17 @@ const register = async (req, res) => {
     const newProfile = new Profile({
       user: newUser._id,
       displayName: username, // ou email.split('@')[0]
+      avatar: '',
+      souvenirScore: 0,
+      ancragePasse: 0,
+      emergenceNostalgie: 0,
+      score: 0,
+      currentLevel: 1,
+      lastLoginDate: new Date(),
+      choices: []
     });
     await newProfile.save();
+    console.log("Profil lié sauvegardé :", newProfile);
 
     // Créer un token JWT pour l'utilisateur
     const token = sign({ userId: newUser._id }, process.env.JWT_SECRET, {

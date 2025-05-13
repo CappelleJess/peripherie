@@ -4,7 +4,7 @@ function GameUniverse() {
   return (
     <div>
       <h2>Univers du jeu</h2>
-      <p>Explorez l'univers fascinant du jeu !</p>
+      <p>Bienvenue dans l'univers de Périphérie. Ce projet vous invite à explorer une mémoire recomposée.</p>
     </div>
   );
 }

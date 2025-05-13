@@ -6,10 +6,18 @@ import RoomScene from './scenes/RoomScene';
 // Configuration du jeu
 const config = {
   type: Phaser.AUTO,
-  width: 800,
-  height: 600,
+  width: 1024,
+  height: 768,
   parent: 'game-container',
-  scene: [MenuScene, HelpScene, RoomScene]
+  scene: [MenuScene, HelpScene, RoomScene],
+  pixelArt: true,
+  backgroundColor: '#000000',
+  physics: {
+    default: 'arcade',
+    arcade: {
+      debug: false
+    }
+  }
 };
 
 // Création du jeu

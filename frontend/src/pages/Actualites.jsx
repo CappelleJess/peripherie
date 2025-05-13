@@ -1,17 +1,20 @@
-import React from "react";
+import FenetrePage from '../components/FenetrePage';
 
-function Actualites() {
+const Actualites = () => {
   return (
-    <div>
-      <h2>Actualités du jeu</h2>
-      <p>Dernière mise à jour : 20 avril 2025</p>
-      <ul>
-        <li>Nouvelle interface terminal rétro ajoutée</li>
-        <li>Ajout de la zone "souvenirs liés"</li>
-        <li>Intégration du profil joueur dans le Dashboard</li>
-      </ul>
-    </div>
+    <FenetrePage titre="Actualités">
+      <h2>Dernières nouvelles</h2>
+      <p>Dernière mise à jour : 13 mai 2025</p>
+      <div>
+        <ul>
+          <li>Ajout de la scène des objets interactifs</li>
+          <li>Refonte du tableau de bord</li>
+          <li>Nouvel effet CRT rétro actif</li>
+        </ul>
+      </div>
+      
+    </FenetrePage>
   );
-}
+};
 
 export default Actualites;

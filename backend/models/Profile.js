@@ -39,6 +39,10 @@ const profileSchema = new mongoose.Schema({
     type: Number,
     default: 1
   },
+  objetsDebloques: {
+    type: [String],
+    default: []
+  },
   lastLoginDate: {
     type: Date,
     default: Date.now,

@@ -7,11 +7,9 @@
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.3.0",
     "@testing-library/user-event": "^13.5.0",
-    "autoprefixer": "^10.4.21",
     "axios": "^1.8.4",
     "framer-motion": "^12.7.4",
     "jwt-decode": "^4.0.0",
-    "postcss": "^8.5.3",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-router-dom": "^7.5.0",
@@ -23,7 +21,9 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "tailwind": "tailwindcss -i ./src/tailwind.css -o ./src/index.css --watch",
+    "dev": "concurrently -k -n \"TAILWIND,FRONTEND,BACKEND,GAME\" -c \"green,blue,magenta,cyan\" \"npm run tailwind\" \"npm run start\" \"cd ../backend && npm run dev\" \"cd ../game && npm run dev\""
   },
   "eslintConfig": {
     "extends": [
@@ -45,6 +45,7 @@
   },
   "devDependencies": {
     "@babel/eslint-parser": "^7.27.1",
+    "concurrently": "^9.1.2",
     "eslint-webpack-plugin": "^5.0.1"
   }
 }

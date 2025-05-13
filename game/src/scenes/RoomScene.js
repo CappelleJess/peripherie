@@ -1,6 +1,9 @@
 import Phaser from 'phaser';
 import GameState from '../data/GameState';
 import { createMemoryObject } from './memoryItems';
+import { createInteractiveObject } from './interactiveItems';
+import { memoryObjectsConfig } from '../data/roomObjects';
+import { interactiveExtrasConfig } from '../data/roomExtras';
 
 export default class RoomScene extends Phaser.Scene {
   constructor() {
@@ -10,11 +13,21 @@ export default class RoomScene extends Phaser.Scene {
   preload() {
     // Images
     this.load.image('background', 'assets/backgrounds/room.png');
-    this.load.image('flower', 'assets/images/flower.png');
+    // Assets
     this.load.image('flower_glow', 'assets/images/flower_glow.png');
     this.load.image('icon_examine', 'assets/images/icon_examine.png');
     this.load.image('icon_smell', 'assets/images/icon_smell.png');
     this.load.image('icon_ignore', 'assets/images/icon_ignore.png');
+    this.load.image('flower', 'assets/images/flower.png');
+    this.load.image('frame', 'assets/images/frame.png');
+    this.load.image('frame_glow', 'assets/images/frame_glow.png');
+    this.load.image('book', 'assets/images/book.png');
+    this.load.image('book_glow', 'assets/images/book_glow.png');
+    // Non-interactifs
+    this.load.image('chair', 'assets/images/chair.png');
+    this.load.image('desk', 'assets/images/desk.png');
+    this.load.image('curtain', 'assets/images/curtain.png');
+
 
     // Audio
     // this.load.audio('ambience', 'assets/audio/ambience_room.mp3');
@@ -38,7 +51,13 @@ export default class RoomScene extends Phaser.Scene {
     this.input.setDefaultCursor('url(assets/images/arrow.png), pointer');
 
     // Fond
-    this.add.image(400, 300, 'room').setOrigin(0.5);
+    this.add.image(512, 384, 'room')
+      .setOrigin(0.5)
+      .setDisplaySize(1024, 768)
+      .setDepth(-1);
+
+    // Profile
+    this.loadPlayerProfile();
 
     // Texte de score
     this.souvenirText = this.add.text(20, 20, `Souvenirs : ${GameState.souvenirScore}`, {
@@ -56,30 +75,17 @@ export default class RoomScene extends Phaser.Scene {
       fill: '#ffffff'
     });
 
-    // Charger la progression depuis l’API
+    // Chargement des scores backend
     this.initGameProgress();
 
-    // Création objet mémoire : flower
-    createMemoryObject(this, {
-      key: 'flower',
-      sprite: 'flower',
-      x: 600,
-      y: 400,
-      scale: 1,
-      choices: {
-        examine: {
-          text: "Cette fleur te rappelle un souvenir agréable de l’époque où tout semblait plus simple.",
-          scores: { souvenir: 1, ancrage: 1, nostalgie: 1 }
-        },
-        smell: {
-          text: "L'odeur de la fleur t'envahit, apportant avec elle des souvenirs chaleureux mais lourds.",
-          scores: { souvenir: 2, ancrage: 2 }
-        },
-        ignore: {
-          text: "Tu détournes le regard, préférant éviter de raviver ce souvenir.",
-          scores: { ancrage: -1 }
-        }
-      }
+    // Objets mémoires
+    memoryObjectsConfig.forEach(config => {
+      createMemoryObject(this, config);
+    });
+
+    // Objets non-impactants
+    interactiveExtrasConfig.forEach(config => {
+      createInteractiveObject(this, config);
     });
 
     // Initialisation de la progression/Nb d'interactions réalisées
@@ -109,7 +115,7 @@ export default class RoomScene extends Phaser.Scene {
     }
   }
 
-  // MàJ de l’affichage à l’écran avec les dernières valeurs des scores
+  // MàJ des scores
   updateScoreDisplay() {
     this.souvenirText.setText(`Souvenirs : ${GameState.souvenirScore}`);
     this.ancrageText.setText(`Ancrage : ${GameState.ancragePasse}`);
@@ -118,24 +124,17 @@ export default class RoomScene extends Phaser.Scene {
 
   // Récupère la progression du joueur via un appel GET à l’API
   initGameProgress() {
-    const token = localStorage.getItem('token');
     const user = JSON.parse(localStorage.getItem('user'));
-    if (!token || !user?._id) {
+    if (!user?._id) {
       console.error("Utilisateur non authentifié.");
       return;
     }
 
-    fetch(`http://localhost:5000/api/game/progress/${user._id}`, {
-      method: 'GET',
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
-    })
-      .then(res => res.json())
-      .then(data => {
-        GameState.souvenirScore = data.souvenirScore || 0;
-        GameState.ancragePasse = data.ancragePasse || 0;
-        GameState.emergenceNostalgie = data.emergenceNostalgie || 0;
+    api.get(`/game/progress/${user._id}`)
+      .then(res => {
+        GameState.souvenirScore = res.data.souvenirScore || 0;
+        GameState.ancragePasse = res.data.ancragePasse || 0;
+        GameState.emergenceNostalgie = res.data.emergenceNostalgie || 0;
         this.updateScoreDisplay();
       })
       .catch(err => {
@@ -143,26 +142,19 @@ export default class RoomScene extends Phaser.Scene {
       });
   }
 
-  // Envoie un choix du joueur au backend via POST (ex: examine, ignore…)
+  // Envoie choix du joueur vers backend via POST
   sendPlayerChoice(choiceKey, impactOnStory) {
-    const token = localStorage.getItem('token');
     const user = JSON.parse(localStorage.getItem('user'));
-    if (!token || !user?._id) return;
+    if (!user?._id) return;
 
-    fetch(`http://localhost:5000/api/game/choices/${user._id}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-      body: JSON.stringify({ choice: choiceKey, impactOnStory })
+    api.post(`/game/choices/${user._id}`, {
+      choice: choiceKey,
+      impactOnStory
     })
-      .then(res => res.json())
-      .then(updatedProfile => {
-        // Met à jour les scores locaux avec les nouvelles valeurs du backend
-        GameState.souvenirScore = updatedProfile.souvenirScore;
-        GameState.ancragePasse = updatedProfile.ancragePasse;
-        GameState.emergenceNostalgie = updatedProfile.emergenceNostalgie;
+      .then(res => {
+        GameState.souvenirScore = res.data.souvenirScore;
+        GameState.ancragePasse = res.data.ancragePasse;
+        GameState.emergenceNostalgie = res.data.emergenceNostalgie;
         this.updateScoreDisplay();
       })
       .catch(err => {
@@ -170,30 +162,53 @@ export default class RoomScene extends Phaser.Scene {
       });
   }
 
-  // Envoie les scores actuels au backend via PUT (trigger fin de scène)
+  // Envoie scores actuels vers backend via PUT (trigger fin de scène)
   sendGameScoresUpdate() {
-    const token = localStorage.getItem('token');
     const user = JSON.parse(localStorage.getItem('user'));
-    if (!token || !user?._id) return;
+    if (!user?._id) return;
 
-    fetch(`http://localhost:5000/api/game/scores/${user._id}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-      body: JSON.stringify({
-        souvenirScore: GameState.souvenirScore,
-        ancragePasse: GameState.ancragePasse,
-        emergenceNostalgie: GameState.emergenceNostalgie
-      })
+    api.put(`/game/scores/${user._id}`, {
+      souvenirScore: GameState.souvenirScore,
+      ancragePasse: GameState.ancragePasse,
+      emergenceNostalgie: GameState.emergenceNostalgie
     })
-      .then(res => res.json())
-      .then(data => {
-        console.log("Scores mis à jour :", data);
+      .then(res => {
+        console.log("Scores mis à jour :", res.data);
       })
       .catch(err => {
         console.error("Erreur lors de la mise à jour des scores :", err);
       });
+  }
+
+  // Fonction pour récupérer le profil du joueur
+  async loadPlayerProfile() {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      console.warn("Aucun token détecté, impossible de charger le profil.");
+      return;
+    }
+
+    try {
+      const response = await fetch('http://localhost:5000/api/profile', {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Erreur HTTP : ${response.status}`);
+      }
+
+      const profile = await response.json();
+      console.log("Profil chargé depuis le backend :", profile);
+
+      // Exemples d'utilisation des données
+      this.displayName = profile.displayName;
+      this.souvenirScore = profile.souvenirScore;
+      this.ancragePasse = profile.ancragePasse;
+    } catch (error) {
+      console.error("Erreur lors du chargement du profil :", error.message);
+    }
   }
 }

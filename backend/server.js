@@ -4,6 +4,7 @@ import cors from 'cors';
 import connectDB from './config/db.js';
 import authRoutes from './routes/authRoutes.js';
 import profileRoutes from './routes/profileRoutes.js';
+console.log("Tentative d'importation de profileRoutes...");
 import gameRoutes from './routes/gameRoutes.js';
 
 config();
@@ -20,17 +21,17 @@ app.use(express.json());
 
 // Route de test
 app.get('/api/test', (req, res) => {
-  res.json({ message: '✅ Backend opérationnel' });
+  res.json({ message: 'Backend opérationnel' });
 });
 
 // Routes principales
 app.use('/api/auth', (req, res, next) => {
-  console.log('➡️  Appel à /api/auth');
+  console.log('Appel à /api/auth');
   next();
 }, authRoutes);
 
 app.use('/api/profile', (req, res, next) => {
-  console.log('➡️  Appel à /api/profile');
+  console.log('Appel à /api/profile');
   next();
 }, profileRoutes);
 

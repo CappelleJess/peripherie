@@ -30,7 +30,7 @@ export default class MenuScene extends Phaser.Scene {
     this.registry.set('ancragePasse', 0);
 
     // Fond d'écran
-    this.add.image(400, 300, 'menu-bg').setOrigin(0.5);
+    this.add.image(512, 384, 'menu-bg').setOrigin(0.5);
 
     // Curseur
     this.input.setDefaultCursor('url(assets/images/arrow.png), pointer');
@@ -45,14 +45,14 @@ export default class MenuScene extends Phaser.Scene {
     }*/
 
     // Titre du jeu
-    this.add.text(400, 200, 'Périphérie', {
+    this.add.text(512, 128, 'Périphérie', {
       fontSize: '48px',
       fill: '#ffffff',
       fontFamily: 'serif'
     }).setOrigin(0.5);
 
     // Bouton "Commencer"
-    const startButton = this.add.text(400, 350, 'Commencer', {
+    const startButton = this.add.text(512, 434, 'Commencer', {
       fontSize: '24px',
       fill: '#dddddd',
       backgroundColor: '#444',
@@ -62,7 +62,7 @@ export default class MenuScene extends Phaser.Scene {
     .setInteractive({ useHandCursor: true });
 
     // Bouton "How to play"
-    const helpButton = this.add.text(400, 420, 'Comment jouer', {
+    const helpButton = this.add.text(512, 504, 'Comment jouer', {
       fontSize: '24px',
       fill: '#dddddd',
       backgroundColor: '#444',

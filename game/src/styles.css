@@ -1,0 +1,6 @@
+canvas {
+  width: 1024px !important;
+  height: 768px !important;
+  display: block;
+  margin: 0 auto;
+}

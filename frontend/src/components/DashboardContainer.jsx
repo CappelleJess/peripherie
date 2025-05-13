@@ -3,6 +3,9 @@ import FenetreRetro from './FenetreRetro';
 import ProfilUser from './ProfilUser';
 import Souvenirs from './Souvenirs';
 import api from '../utils/api';
+import ScoreTotal from './ScoreTotal.jsx';
+import ObjetsMemoire from './ObjetsMemoire.jsx';
+import ChargementRetro from './ChargementRetro.jsx';
 
 const DashboardContainer = () => {
   // État pour gérer les fenêtres ouvertes
@@ -23,59 +26,65 @@ const DashboardContainer = () => {
       });
   }, []);
   
-  const ouvrirFenetre = (type) => {
-    if (!fenetres.find(f => f.type === type)) {
-      const nouvelleFenetre = {
-        id: Date.now(),
-        type,
-        titre: type === 'profil' ? 'Mon Profil' : 'Souvenirs'
-      };
-      setFenetres([...fenetres, nouvelleFenetre]);
+  const toggleFenetre = (type, titre) => {
+    const existante = fenetres.find(f => f.type === type);
+    if (existante) {
+      // Si elle est déjà ouverte, on la ferme
+      setFenetres(fenetres.filter(f => f.type !== type));
+    } else {
+      // Sinon on l'ajoute
+      setFenetres([...fenetres, { id: Date.now(), type, titre }]);
     }
   };
 
-  // Fermer une fenêtre
   const fermerFenetre = (id) => {
     setFenetres(fenetres.filter(f => f.id !== id));
   };
 
-  // Exemple fictif de profil
-  // const profil = {
-  //   displayName: "EchoPlayer",
-  //   souvenirScore: 42,
-  //   lienPNJ: "fort",
-  //   ancragePasse: "modéré",
-  //   score: 88,
-  //   lastLoginDate: "2025-04-19T13:15:00Z"
-  // };
-
   // Rendu du contenu selon le type
     const getContenu = (type) => {
-        switch (type) {
-            case "profil":
-        return <ProfilUser profile={profil} />;
-            case "souvenirs":
-        return <Souvenirs />;
-            default:
-        return <div>Contenu inconnu</div>;
-        }
+      // Garde-fou global - protection de l'accès 
+      if (!profil) return <ChargementRetro message="Chargement des souvenirs..." />;
+      switch (type) {
+        case "profil":
+          return <ProfilUser profile={profil} setProfil={setProfil} />;
+        case "souvenirs":
+          return <Souvenirs profile={profil} />;
+        case "progression":
+          return (
+            <>
+              <div className="mt-4">
+                <ScoreTotal score={profil.score} />
+                <ObjetsMemoire objets={profil.objetsDebloques} />
+              </div>
+            </>
+          );
+        default:
+          return <div>Contenu inconnu</div>;
+      }
     };
 
   return (
-    <div className="relative w-full h-full bg-[#1b1f3b] text-[#faf3e0]">
+  <div className="relative w-full h-auto min-h-screen bg-[#1b1f3b] text-[#faf3e0] p-4 ">
       {/* Barre de boutons */}
-      <div className="p-2 flex gap-4 bg-[#2e2e2e] text-white shadow-md">
+      <div className="p-2 flex gap-4 bg-[#3e4161] text-white shadow-md border-b border-[#6b728e]">
         <button
           className="bg-[#4a90e2] hover:bg-[#357ABD] px-3 py-1 rounded"
-          onClick={() => ouvrirFenetre('profil')}
+          onClick={() => toggleFenetre('profil', 'Mon Profil')}
         >
-          Ouvrir Profil
+          Profil
         </button>
         <button
           className="bg-[#9b5de5] hover:bg-[#844bcc] px-3 py-1 rounded"
-          onClick={() => ouvrirFenetre('souvenirs')}
+          onClick={() => toggleFenetre('souvenirs', 'Souvenirs')}
         >
-          Ouvrir Souvenirs
+          Souvenirs
+        </button>
+        <button
+          className="bg-[#d65a31] hover:bg-[#b04a25] px-3 py-1 rounded"
+          onClick={() => toggleFenetre('progression', 'Progression')}
+        >
+          Progression
         </button>
       </div>
 

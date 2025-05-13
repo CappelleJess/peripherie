@@ -15,9 +15,11 @@ import GameState from '../data/GameState';
 export function createMemoryObject(scene, config) {
   const { key, sprite, x, y, scale = 1, choices } = config;
 
+  // Création du sprite de l'objet interactif
   const object = scene.add.image(x, y, sprite)
     .setInteractive({ useHandCursor: true })
-    .setScale(scale);
+    .setScale(scale)
+    .setName(key);
 
   let isDialogueOpen = false;
   let halo = null;
@@ -70,22 +72,40 @@ export function createMemoryObject(scene, config) {
     });
   }
 
+  function getIntroText(objectKey) {
+    switch (objectKey) {
+      case 'flower': return "Un brin de myosotis...";
+      case 'book': return "Un carnet mystérieux...";
+      case 'frame': return "Un cadre photo usé...";
+      default: return "Un objet intrigant...";
+    }
+  }
+
   function showFullDialogue() {
+    const currentKey = key;
     isDialogueOpen = true;
     GameState.dialogueOpen = true;
 
-    const dialogueBox = scene.add.rectangle(400, 200, 400, 200, 0x000000, 1).setOrigin(0.5);
-    const dialogueText = scene.add.text(400, 180, `Un brin de myosotis...`, {
+    // Boîte de dialogue noire au centre de l’écran
+    const dialogueBox = scene.add.rectangle(512, 250, 400, 200, 0x000000, 1).setOrigin(0.5);
+    // Texte d'intro unique selon l'objet
+    const dialogueText = scene.add.text(512, 230, getIntroText(currentKey), {
       fontSize: '18px', fill: '#ffffff', wordWrap: { width: 380 }
     }).setOrigin(0.5);
 
-    const buttons = {
-      examine: scene.add.image(250, 250, 'icon_examine').setScale(1).setInteractive(),
-      smell: scene.add.image(400, 250, 'icon_smell').setScale(1).setInteractive(),
-      ignore: scene.add.image(550, 250, 'icon_ignore').setScale(1).setInteractive()
-    };
+    const buttons = {};
+    const keys = Object.keys(choices);                  // Ex: ['examine'], ['ignore', 'smell']
+    const boxWidth = 400;
+    const iconSpacing = boxWidth / (keys.length + 1);   // espace régulier dans la boîte
+    const startX = 512 - (boxWidth / 2) + iconSpacing;  // point de départ dans la boîte
 
-    for (const [key, btn] of Object.entries(buttons)) {
+    keys.forEach((choiceKey, index) => {
+      const iconKey = `icon_${choiceKey}`;              // ex: 'icon_examine'
+      const x = startX + iconSpacing * index;
+      const btn = scene.add.image(x, 300, iconKey)
+        .setScale(1)
+        .setInteractive();
+
       btn.on('pointerdown', () => {
         // Animation de clic visuelle
         scene.tweens.add({
@@ -93,31 +113,24 @@ export function createMemoryObject(scene, config) {
           scale: btn.scale * 0.9,
           yoyo: true,
           duration: 100
-        });
+        });  
 
         // Marquer l'interaction dans GameState
-        GameState.interactions[sprite] = key;
-
+        GameState.interactions[sprite] = choiceKey;
         // Désactiver les autres boutons
         disableAll();
-
         // Afficher le texte du choix
-        dialogueText.setText(choices[key].text);
-
+        dialogueText.setText(choices[choiceKey].text);
         // Mettre à jour les scores localement
-        updateScores(choices[key].scores);
-
+        updateScores(choices[choiceKey].scores);
         // Ajouter l'effet visuel lumineux
         addHalo();
-
         // Incrémenter le nombre d’objets interactés
         GameState.objectsInteracted = (GameState.objectsInteracted || 0) + 1;
 
-        // ➕ NOUVEAU : Envoyer le choix au backend via RoomScene
+        // Envoyer le choix au backend via RoomScene
         if (typeof scene.sendPlayerChoice === 'function') {
-          const { choiceKey } = choices[key]; // clé explicite ou fallback vers key
-          const impact = choices[key].text;   // texte comme résumé d’impact
-          scene.sendPlayerChoice(choiceKey || key, impact);
+          scene.sendPlayerChoice(choiceKey, choices[choiceKey].text);
         }
 
         // Fermer le dialogue après un délai
@@ -127,12 +140,16 @@ export function createMemoryObject(scene, config) {
           GameState.dialogueOpen = false;
         });
       });
-    }
 
+      buttons[choiceKey] = btn;
+    });
+
+    // Désactive tous les boutons restants
     function disableAll() {
       Object.values(buttons).forEach(btn => btn.disableInteractive());
     }
 
+    // Détruit les éléments de la boîte de dialogue 
     function destroyAll() {
       const allElements = [dialogueBox, dialogueText, ...Object.values(buttons)];
 

@@ -8,6 +8,7 @@ const router = express.Router();
 
 // Routes protégées par JWT
 router.get('/', verifyToken, getMyProfile);             // GET mon profil
+console.log("profileRoutes.js chargé");
 router.put('/', verifyToken, updateMyProfile);          // PUT mise à jour de mon profil
 router.delete('/', verifyToken, deleteMyProfile);       // DELETE mon profil
 

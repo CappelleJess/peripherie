@@ -12,14 +12,18 @@ export const getAllProfiles = async (req, res) => {
 
 // Obtenir le profil de l'utilisateur connecté
 export const getMyProfile = async (req, res) => {
-  console.log("Token décodé utilisateur :", req.user);
+  console.log("getMyProfile exécuté");
+  console.log("Token décodé utilisateur :", req.userId);
   try {
-    const profile = await Profile.findOne({ user: req.user.userId });
+    const profile = await Profile.findOne({ user: req.userId });
     if (!profile) {
+      console.warn("Aucun profil trouvé pour cet utilisateur");
       return res.status(404).json({ message: 'Profil non trouvé' });
     }
+    console.log("Profil trouvé :", profile);
     res.json(profile);
   } catch (error) {
+    console.error("Erreur serveur dans getMyProfile :", error.message);
     res.status(500).json({ message: 'Erreur serveur' });
   }
 };
@@ -28,7 +32,7 @@ export const getMyProfile = async (req, res) => {
 export const updateMyProfile = async (req, res) => {
   try {
     const updatedProfile = await Profile.findOneAndUpdate(
-      { user: req.user.userId },
+      { user: req.userId },
       { $set: req.body },
       { new: true }
     );
@@ -44,7 +48,7 @@ export const updateMyProfile = async (req, res) => {
 // Supprimer son propre profil
 export const deleteMyProfile = async (req, res) => {
   try {
-    const result = await Profile.findOneAndDelete({ user: req.user.userId });
+    const result = await Profile.findOneAndDelete({ user: req.userId });
     if (!result) {
       return res.status(404).json({ message: 'Profil non trouvé' });
     }
